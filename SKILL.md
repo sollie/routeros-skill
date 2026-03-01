@@ -1,6 +1,6 @@
 ---
 name: routeros
-description: Use when working with MikroTik RouterOS configuration, CLI commands, REST API, firewall rules, networking setup, VPN, wireless, bridging, routing protocols, or building tools that interact with RouterOS devices. Covers RouterOS v7 CLI syntax, REST API usage, security hardening, and best practices.
+description: Use when working with MikroTik RouterOS configuration, CLI commands, REST API, firewall rules, networking setup, VPN, wireless, bridging, routing protocols, MPLS, MLAG, containers, hotspot/captive portal, scripting, or building tools that interact with RouterOS devices. Covers RouterOS v7 CLI syntax, REST API (including auth, ETags, filtering), classic socket API, security hardening, certificates/HTTPS, and best practices.
 ---
 
 # MikroTik RouterOS
@@ -42,6 +42,12 @@ Always consult these authoritative sources for RouterOS information:
 | Firewall | https://help.mikrotik.com/docs/spaces/ROS/pages/119144601/Firewall+and+Quality+of+Service | Firewall rules, NAT, mangle, QoS |
 | Routing | https://help.mikrotik.com/docs/spaces/ROS/pages/328222/Unicast+Routing+Protocols | OSPF, BGP, RIP, static routing |
 | VPN | https://help.mikrotik.com/docs/spaces/ROS/pages/119144597/Virtual+Private+Networks | WireGuard, IPsec, L2TP, OpenVPN |
+| Scripting | https://help.mikrotik.com/docs/spaces/ROS/pages/328228/Scripting | Built-in scripting language reference |
+| Certificates | https://help.mikrotik.com/docs/spaces/ROS/pages/7962650/Certificates | TLS cert management, HTTPS setup |
+| Container | https://help.mikrotik.com/docs/spaces/ROS/pages/84901929/Container | OCI container runtime |
+| Hotspot | https://help.mikrotik.com/docs/spaces/ROS/pages/1409115/HotSpot | Captive portal / guest access |
+| MLAG | https://help.mikrotik.com/docs/spaces/ROS/pages/196345860/MLAG | Multi-chassis link aggregation |
+| MPLS | https://help.mikrotik.com/docs/spaces/ROS/pages/328144/MPLS | Label switching and LDP |
 
 ## RouterOS CLI Structure
 
@@ -87,6 +93,7 @@ Items can be referenced by:
 print detail          -- show all properties
 print brief           -- show summary
 print value-list      -- machine-parseable output
+print as-value        -- returns an array of records usable in scripts (e.g. [/ip/address get 0 as-value])
 print count-only      -- just the count
 print where disabled=yes  -- filter results
 print stats           -- show statistics
@@ -365,6 +372,15 @@ The classic API is useful when:
 - Persistent connections with event-based updates are required
 - Working with RouterOS versions before v7.1
 
+**Login sequence** (MD5 challenge-response):
+1. Connect to TCP 8728 (plain) or 8729 (SSL)
+2. Send a `/login` sentence — router replies with a `=ret=<challenge>` word
+3. Hash the password: `MD5(null_byte + password + unhex(challenge))`, encode as lowercase hex
+4. Send a second `/login` sentence with `=name=<user>` and `=response=00<hash>`
+5. Router replies with an empty `!done` sentence on success
+
+Most users should use an existing library rather than implementing this directly.
+
 Go client library: `github.com/go-routeros/routeros/v3`
 
 ## RouterOS Feature Areas
@@ -395,6 +411,7 @@ Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/119144613/Network+Manageme
 /ip/firewall/connection      -- active connection tracking table
 /ipv6/firewall/filter        -- IPv6 filter rules
 /ipv6/firewall/nat           -- IPv6 NAT
+/ipv6/firewall/raw           -- IPv6 bypass connection tracking
 ```
 
 **Dynamic address lists** allow rules to automatically add IPs to a named list, enabling port-knock sequences and brute-force protection:
@@ -561,6 +578,8 @@ Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/1409138/Wireless
 /user                        -- user accounts and groups
 /user/group                  -- permission groups (full, read, write, or custom policy bitmask)
 /user/aaa                    -- AAA settings: RADIUS authentication, accounting
+/radius                      -- RADIUS client configuration (server address, secret, service)
+/interface/list              -- named interface lists used in firewall, discovery, MAC server rules
 /ip/service                  -- management services (ssh, winbox, api, www, etc.)
 /ip/ssh                      -- SSH server settings
 /certificate                 -- TLS/SSL certificate management
@@ -695,6 +714,18 @@ These recommendations come from the official MikroTik security documentation. Ap
 - Change the default `admin` username; create a new full-access user with a strong password (12+ characters, mixed case, numbers, symbols)
 - Disable or remove the `admin` user after verifying new credentials work
 - Restrict user login to specific IP addresses: `/user set myname address=192.168.88.0/24`
+- **For API/automation access, always use a dedicated restricted user** — never use a full-privilege account in scripts or external tools:
+
+```
+# Create a read-only group for monitoring/automation
+/user/group add name=api-read policy=read,api,!write,!policy,!test,!password,!reboot,!sniff,!sensitive
+
+# Create the API user, restricted to the management subnet
+/user add name=api-user group=api-read password=<strong-password> \
+    address=192.168.88.0/24
+```
+
+If the automation needs to make changes, scope the policy bitmask to only the required permissions (e.g. add `write` but not `policy` or `password`).
 
 ### Services
 

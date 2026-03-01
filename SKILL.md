@@ -25,6 +25,12 @@ RouterOS is a Linux-based network operating system that powers MikroTik hardware
 
 Always consult these authoritative sources for RouterOS information:
 
+> **URL stability warning**: The documentation runs on Atlassian Confluence. URLs embed a numeric page ID (e.g. `/pages/119144601/`) followed by a human-readable slug. The slug is cosmetic — only the ID matters for resolution. MikroTik has reorganized pages in the past, causing IDs to silently resolve to wrong pages or return 404. If a URL below seems to point to the wrong content, look up the current ID via the Confluence child-page API:
+> ```
+> https://help.mikrotik.com/docs/rest/api/content/328059/child/page?limit=50
+> ```
+> This returns the live page tree under the RouterOS root (ID `328059`) as JSON, with each entry's `id` and `title`. Use the correct `id` to construct the updated URL as `/spaces/ROS/pages/<id>/<Title+With+Pluses>`.
+
 | Source | URL | Use For |
 |---|---|---|
 | Official Docs | https://help.mikrotik.com/docs/ | Definitive reference for all features |
@@ -33,9 +39,9 @@ Always consult these authoritative sources for RouterOS information:
 | Securing Router | https://help.mikrotik.com/docs/spaces/RKB/pages/8323164/Securing+your+router | Security hardening checklist |
 | REST API | https://help.mikrotik.com/docs/spaces/ROS/pages/47579162/REST+API | Programmatic access via HTTP/JSON |
 | Classic API | https://help.mikrotik.com/docs/spaces/ROS/pages/47579160/API | Socket-based binary protocol |
-| Firewall | https://help.mikrotik.com/docs/spaces/ROS/pages/328168/Firewall+and+Quality+of+Service | Firewall rules, NAT, mangle, QoS |
-| Routing | https://help.mikrotik.com/docs/spaces/ROS/pages/328218/Unicast+Routing+Protocols | OSPF, BGP, RIP, static routing |
-| VPN | https://help.mikrotik.com/docs/spaces/ROS/pages/328227/Virtual+Private+Networks | WireGuard, IPsec, L2TP, OpenVPN |
+| Firewall | https://help.mikrotik.com/docs/spaces/ROS/pages/119144601/Firewall+and+Quality+of+Service | Firewall rules, NAT, mangle, QoS |
+| Routing | https://help.mikrotik.com/docs/spaces/ROS/pages/328222/Unicast+Routing+Protocols | OSPF, BGP, RIP, static routing |
+| VPN | https://help.mikrotik.com/docs/spaces/ROS/pages/119144597/Virtual+Private+Networks | WireGuard, IPsec, L2TP, OpenVPN |
 
 ## RouterOS CLI Structure
 
@@ -245,7 +251,7 @@ Go client library: `github.com/go-routeros/routeros`
 /ipv6/dhcp-server            -- DHCPv6 server
 ```
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328206/Network+Management
+Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/119144613/Network+Management
 
 ### Firewall
 
@@ -260,7 +266,7 @@ Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328206/Network+Management
 /ipv6/firewall/nat           -- IPv6 NAT
 ```
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328168/Firewall+and+Quality+of+Service
+Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/119144601/Firewall+and+Quality+of+Service
 
 ### Routing
 
@@ -276,7 +282,7 @@ Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328168/Firewall+and+Qualit
 /ip/vrf                      -- Virtual Routing and Forwarding
 ```
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328218/Unicast+Routing+Protocols
+Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328222/Unicast+Routing+Protocols
 
 ### Bridging & Switching
 
@@ -291,7 +297,7 @@ Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328218/Unicast+Routing+Pro
 /interface/ethernet/switch   -- switch chip configuration
 ```
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328146/Bridging+and+Switching
+Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328068/Bridging+and+Switching
 
 ### VPN
 
@@ -311,7 +317,7 @@ Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328146/Bridging+and+Switch
 /zerotier                    -- ZeroTier virtual networking
 ```
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328227/Virtual+Private+Networks
+Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/119144597/Virtual+Private+Networks
 
 ### Wireless
 
@@ -324,7 +330,7 @@ Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328227/Virtual+Private+Net
 /caps-man                    -- centralized AP management (CAPsMAN)
 ```
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328230/Wireless
+Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/1409138/Wireless
 
 ### System & Management
 
@@ -439,6 +445,8 @@ add chain=forward action=drop connection-state=new connection-nat-state=!dstnat 
 /ip/upnp set enabled=no
 /ip/cloud set ddns-enabled=no update-time=no
 ```
+
+> **v7.17+ note**: In RouterOS v7.17 and later the default for `ddns-enabled` changed. If Back To Home was enabled, disable it first, then use `ddns-enabled=auto` instead of `ddns-enabled=no`.
 
 ### Remote Access
 

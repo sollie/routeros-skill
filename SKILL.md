@@ -1,5 +1,5 @@
 ---
-name: mikrotik-routeros
+name: routeros
 description: Use when working with MikroTik RouterOS configuration, CLI commands, REST API, firewall rules, networking setup, VPN, wireless, bridging, routing protocols, or building tools that interact with RouterOS devices. Covers RouterOS v7 CLI syntax, REST API usage, security hardening, and best practices.
 ---
 

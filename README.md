@@ -1,4 +1,4 @@
-# mikrotik-routeros
+# routeros
 
 An [Agent Skills](https://agentskills.io) skill that gives AI coding agents deep knowledge of MikroTik RouterOS v7 — CLI syntax, REST API, firewall, routing, VPN, wireless, security hardening, and configuration management.
 
@@ -19,14 +19,14 @@ The skill is a single directory containing `SKILL.md`. Place it in the skills di
 
 ```bash
 mkdir -p ~/.config/opencode/skills
-git clone https://github.com/sollie/mikrotik-routeros-skill ~/.config/opencode/skills/mikrotik-routeros
+git clone https://github.com/sollie/routeros-skill ~/.config/opencode/skills/routeros
 ```
 
 ### Claude Code
 
 ```bash
 mkdir -p ~/.claude/skills
-git clone https://github.com/sollie/mikrotik-routeros-skill ~/.claude/skills/mikrotik-routeros
+git clone https://github.com/sollie/routeros-skill ~/.claude/skills/routeros
 ```
 
 ### Other compatible tools
@@ -38,7 +38,7 @@ Any tool listed on [agentskills.io](https://agentskills.io) supports this format
 Once installed, the skill is loaded automatically when you work on RouterOS-related tasks. You can also invoke it directly:
 
 ```
-/mikrotik-routeros
+/routeros
 ```
 
 ## Compatibility

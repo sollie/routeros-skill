@@ -1,11 +1,11 @@
 ---
 name: routeros
-description: Use when working with MikroTik RouterOS configuration, CLI commands, REST API, firewall rules, networking setup, VPN, wireless, bridging, routing protocols, MPLS, MLAG, containers, hotspot/captive portal, scripting, or building tools that interact with RouterOS devices. Covers RouterOS v7 CLI syntax, REST API (including auth, ETags, filtering), classic socket API, security hardening, certificates/HTTPS, and best practices.
+description: Use when working with MikroTik RouterOS configuration, CLI commands, REST API, firewall rules, networking setup, VPN, wireless, bridging, routing protocols, MPLS, MLAG, containers, hotspot/captive portal, scripting, or building tools that interact with RouterOS devices. Covers RouterOS v7 CLI syntax, REST API, classic socket API, security hardening, certificates/HTTPS, and best practices.
 ---
 
 # MikroTik RouterOS
 
-RouterOS is a Linux-based network operating system that powers MikroTik hardware devices and is also available as a virtual machine (Cloud Hosted Router / CHR). RouterOS v7 is the current major version (latest stable branch: v7.21.x), using Linux kernel 5.6.3. It provides routing, firewall, bridging, VPN, wireless, QoS, container workloads, and monitoring capabilities configurable via CLI, WinBox GUI, WebFig, REST API, and a socket-based API.
+RouterOS is a Linux-based network operating system that powers MikroTik hardware devices and is also available as a virtual machine (Cloud Hosted Router / CHR). RouterOS v7 is the current major version. Verify the installed and current stable versions before giving version-specific guidance. RouterOS provides routing, firewall, bridging, VPN, wireless, QoS, container workloads, and monitoring capabilities configurable via CLI, WinBox GUI, WebFig, REST API, and a socket-based API.
 
 ## When to Use This Skill
 
@@ -25,26 +25,22 @@ RouterOS is a Linux-based network operating system that powers MikroTik hardware
 
 Always consult these authoritative sources for RouterOS information:
 
-> **URL stability warning**: The documentation runs on Atlassian Confluence. URLs embed a numeric page ID (e.g. `/pages/119144601/`) followed by a human-readable slug. The slug is cosmetic — only the ID matters for resolution. MikroTik has reorganized pages in the past, causing IDs to silently resolve to wrong pages or return 404. If a URL below seems to point to the wrong content, look up the current ID via the Confluence child-page API:
-> ```
-> https://help.mikrotik.com/docs/rest/api/content/328059/child/page?limit=50
-> ```
-> This returns the live page tree under the RouterOS root (ID `328059`) as JSON, with each entry's `id` and `title`. Use the correct `id` to construct the updated URL as `/spaces/ROS/pages/<id>/<Title+With+Pluses>`.
+> Use the current manual's `llms.txt` index to locate pages. Prefer per-page Markdown URLs when retrieving documentation: https://manual.mikrotik.com/llms.txt
 
 | Source | URL | Use For |
 |---|---|---|
-| Official Docs | https://help.mikrotik.com/docs/ | Definitive reference for all features |
+| Official Docs | https://manual.mikrotik.com/docs/introduction/ | Definitive reference for all features |
 | Community Forum | https://forum.mikrotik.com/ | Real-world examples, troubleshooting, edge cases |
 | First Time Config | https://help.mikrotik.com/docs/spaces/ROS/pages/328151/First+Time+Configuration | Initial setup guide and best practices |
 | Securing Router | https://help.mikrotik.com/docs/spaces/RKB/pages/8323164/Securing+your+router | Security hardening checklist |
-| REST API | https://help.mikrotik.com/docs/spaces/ROS/pages/47579162/REST+API | Programmatic access via HTTP/JSON |
-| Classic API | https://help.mikrotik.com/docs/spaces/ROS/pages/47579160/API | Socket-based binary protocol |
+| REST API | https://manual.mikrotik.com/docs/developer-guides/rest-api | Programmatic access via HTTP/JSON |
+| Classic API | https://manual.mikrotik.com/docs/developer-guides/api/ | Socket-based binary protocol |
 | Firewall | https://help.mikrotik.com/docs/spaces/ROS/pages/119144601/Firewall+and+Quality+of+Service | Firewall rules, NAT, mangle, QoS |
 | Routing | https://help.mikrotik.com/docs/spaces/ROS/pages/328222/Unicast+Routing+Protocols | OSPF, BGP, RIP, static routing |
 | VPN | https://help.mikrotik.com/docs/spaces/ROS/pages/119144597/Virtual+Private+Networks | WireGuard, IPsec, L2TP, OpenVPN |
-| Scripting | https://help.mikrotik.com/docs/spaces/ROS/pages/328228/Scripting | Built-in scripting language reference |
-| Certificates | https://help.mikrotik.com/docs/spaces/ROS/pages/7962650/Certificates | TLS cert management, HTTPS setup |
-| Container | https://help.mikrotik.com/docs/spaces/ROS/pages/84901929/Container | OCI container runtime |
+| Scripting | https://manual.mikrotik.com/docs/developer-guides/scripting/ | Built-in scripting language reference |
+| Certificates | https://manual.mikrotik.com/docs/authentication-authorization-accounting/certificates | TLS cert management, HTTPS setup |
+| Container | https://manual.mikrotik.com/docs/containers/ | OCI container runtime |
 | Hotspot | https://help.mikrotik.com/docs/spaces/ROS/pages/1409115/HotSpot | Captive portal / guest access |
 | MLAG | https://help.mikrotik.com/docs/spaces/ROS/pages/196345860/MLAG | Multi-chassis link aggregation |
 | MPLS | https://help.mikrotik.com/docs/spaces/ROS/pages/328144/MPLS | Label switching and LDP |
@@ -117,7 +113,7 @@ RouterOS has a built-in scripting language used in `/system/script` and `/system
 
 > **`:local` vs `:set`**: `:local` declares a variable (must come first, at the top of scope). `:set` assigns or updates its value. Using `:set` on an undeclared variable at script scope is an error; always declare with `:local` first.
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/328228/Scripting
+Docs: https://manual.mikrotik.com/docs/developer-guides/scripting/
 
 ### Scripting — Error Handling
 
@@ -140,9 +136,9 @@ Use `:do`/`:on-error` to catch failures without aborting the script:
 [:parse $cmd]
 ```
 
-### Scripting — Environment Variables & Script Arguments
+### Scripting — Environment Variables & Function Arguments
 
-Scripts receive arguments via the `$1`, `$2`, ... positional parameters when called via `/system/script/run` with arguments, or from the scheduler with parameters set in the `parameters` field.
+Stored scripts run through `/system/script/run` do not accept arbitrary arguments. RouterOS functions can receive named and positional arguments.
 
 Access global environment variables with `:global`:
 
@@ -160,13 +156,14 @@ Read a global set by another script or the scheduler:
 :put "Run count: $counter"
 ```
 
-Pass parameters from CLI:
+Define and call a function:
 
 ```
-/system/script/run scriptName parameters="arg1 arg2"
+:global myFunc do={ :put "name=$name"; :put "first=$1" }
+$myFunc name="example" "first positional value"
 ```
 
-Inside the script, read them as `$1` and `$2`. For named parameters, use global variables as a convention.
+Named arguments use their names and unnamed arguments use `$1`, `$2`, and so on inside the function.
 
 ### Scripting — Common Built-ins
 
@@ -208,9 +205,9 @@ To generate a self-signed certificate and enable HTTPS (required for production 
 /ip/service set www disabled=yes
 ```
 
-> **REST API clients**: Pass `-k` (curl) or disable certificate verification in your HTTP client when using a self-signed cert. For production, use a cert signed by a trusted CA (e.g. Let's Encrypt via the ACME package).
+> **REST API clients**: Import a self-signed CA into the client's trust store or use a certificate issued by a trusted CA. Limit `curl -k` or disabled certificate verification to isolated testing because it permits man-in-the-middle attacks.
 
-Docs: https://help.mikrotik.com/docs/spaces/ROS/pages/7962650/Certificates
+Docs: https://manual.mikrotik.com/docs/authentication-authorization-accounting/certificates
 
 ### Base URL
 
@@ -220,26 +217,15 @@ https://<router_ip>/rest
 
 ### Authentication
 
-HTTP Basic Auth using RouterOS user credentials.
-
-For session-based auth (avoids sending credentials on every request), use the login endpoint:
+HTTP Basic Auth using RouterOS user credentials. Use a dedicated restricted user and keep credentials out of command arguments. For curl, store credentials in a permission-restricted netrc file:
 
 ```bash
-# Obtain session cookie
-curl -k -c cookies.txt -X POST \
-  https://10.0.0.1/rest/login \
-  -H "content-type: application/json" \
-  -d '{"username":"admin","password":"secret"}'
-
-# Use session cookie on subsequent requests
-curl -k -b cookies.txt https://10.0.0.1/rest/ip/address
+machine router.example.com
+login api-user
+password <strong-password>
 ```
 
-The session cookie is named `_api_session`. Logout to invalidate it:
-
-```bash
-curl -k -b cookies.txt -X GET https://10.0.0.1/rest/logout
-```
+Set its mode to `0600`, then use `curl --netrc-file ~/.config/routeros/netrc`. The REST API does not document cookie-based login or logout endpoints.
 
 ### HTTP Methods
 
@@ -255,26 +241,26 @@ curl -k -b cookies.txt -X GET https://10.0.0.1/rest/logout
 
 ```bash
 # List all IP addresses
-curl -k -u admin:password https://10.0.0.1/rest/ip/address
+curl --netrc-file ~/.config/routeros/netrc https://router.example.com/rest/ip/address
 
 # Get a single record by internal ID
-curl -k -u admin:password https://10.0.0.1/rest/ip/address/*1
+curl --netrc-file ~/.config/routeros/netrc https://router.example.com/rest/ip/address/*1
 
 # Get interface by name
-curl -k -u admin:password https://10.0.0.1/rest/interface/ether1
+curl --netrc-file ~/.config/routeros/netrc https://router.example.com/rest/interface/ether1
 
 # Filter results
-curl -k -u admin:password "https://10.0.0.1/rest/ip/address?network=192.168.88.0&dynamic=false"
+curl --netrc-file ~/.config/routeros/netrc "https://router.example.com/rest/ip/address?network=192.168.88.0&dynamic=false"
 
 # Select specific properties
-curl -k -u admin:password "https://10.0.0.1/rest/ip/address?.proplist=address,interface,disabled"
+curl --netrc-file ~/.config/routeros/netrc "https://router.example.com/rest/ip/address?.proplist=address,interface,disabled"
 ```
 
 ### PUT Example (Create)
 
 ```bash
-curl -k -u admin:password -X PUT \
-  https://10.0.0.1/rest/ip/address \
+curl --netrc-file ~/.config/routeros/netrc -X PUT \
+  https://router.example.com/rest/ip/address \
   -H "content-type: application/json" \
   -d '{"address":"192.168.100.1/24","interface":"ether3"}'
 ```
@@ -282,8 +268,8 @@ curl -k -u admin:password -X PUT \
 ### PATCH Example (Update)
 
 ```bash
-curl -k -u admin:password -X PATCH \
-  https://10.0.0.1/rest/ip/address/*3 \
+curl --netrc-file ~/.config/routeros/netrc -X PATCH \
+  https://router.example.com/rest/ip/address/*3 \
   -H "content-type: application/json" \
   -d '{"comment":"management network"}'
 ```
@@ -291,28 +277,28 @@ curl -k -u admin:password -X PATCH \
 ### DELETE Example
 
 ```bash
-curl -k -u admin:password -X DELETE \
-  https://10.0.0.1/rest/ip/address/*3
+curl --netrc-file ~/.config/routeros/netrc -X DELETE \
+  https://router.example.com/rest/ip/address/*3
 ```
 
 ### POST Example (Universal Command)
 
 ```bash
 # Ping a host (must use count to avoid timeout)
-curl -k -u admin:password -X POST \
-  https://10.0.0.1/rest/ping \
+curl --netrc-file ~/.config/routeros/netrc -X POST \
+  https://router.example.com/rest/ping \
   -H "content-type: application/json" \
   -d '{"address":"8.8.8.8","count":"4"}'
 
 # Run a script
-curl -k -u admin:password -X POST \
-  https://10.0.0.1/rest/system/script/run \
+curl --netrc-file ~/.config/routeros/netrc -X POST \
+  https://router.example.com/rest/system/script/run \
   -H "content-type: application/json" \
   -d '{".id":"*1"}'
 
 # Export configuration
-curl -k -u admin:password -X POST \
-  https://10.0.0.1/rest/export \
+curl --netrc-file ~/.config/routeros/netrc -X POST \
+  https://router.example.com/rest/export \
   -H "content-type: application/json" \
   -d '{}'
 ```
@@ -321,8 +307,8 @@ curl -k -u admin:password -X POST \
 
 ```bash
 # Get ethernet and VLAN interfaces using query stack
-curl -k -u admin:password -X POST \
-  https://10.0.0.1/rest/interface/print \
+curl --netrc-file ~/.config/routeros/netrc -X POST \
+  https://router.example.com/rest/interface/print \
   -H "content-type: application/json" \
   -d '{".query":["type=ether","type=vlan","#|"]}'
 ```
@@ -334,25 +320,6 @@ curl -k -u admin:password -X POST \
 - **String values**: All JSON response values are encoded as strings, even numbers and booleans.
 - **Single creation**: Only one resource can be created per PUT request.
 - **Error format**: `{"error": <http_code>, "message": "<description>", "detail": "<optional>"}`
-
-### Optimistic Concurrency (ETag / If-Match, v7.7+)
-
-GET requests return an `ETag` header containing a hash of the resource state. Use it with `If-Match` on PATCH/DELETE to prevent overwriting concurrent changes:
-
-```bash
-# Fetch resource and capture ETag
-ETAG=$(curl -k -u admin:password -I https://10.0.0.1/rest/ip/address/*3 \
-  | grep -i etag | awk '{print $2}' | tr -d '\r')
-
-# Update only if resource hasn't changed
-curl -k -u admin:password -X PATCH \
-  https://10.0.0.1/rest/ip/address/*3 \
-  -H "content-type: application/json" \
-  -H "If-Match: $ETAG" \
-  -d '{"comment":"updated"}'
-```
-
-If the resource was modified since the ETag was issued, the server returns `412 Precondition Failed`.
 
 ## Classic API (Socket-Based)
 
@@ -372,12 +339,12 @@ The classic API is useful when:
 - Persistent connections with event-based updates are required
 - Working with RouterOS versions before v7.1
 
-**Login sequence** (MD5 challenge-response):
-1. Connect to TCP 8728 (plain) or 8729 (SSL)
-2. Send a `/login` sentence — router replies with a `=ret=<challenge>` word
-3. Hash the password: `MD5(null_byte + password + unhex(challenge))`, encode as lowercase hex
-4. Send a second `/login` sentence with `=name=<user>` and `=response=00<hash>`
-5. Router replies with an empty `!done` sentence on success
+**Login sequence:**
+1. Connect with TLS to TCP 8729.
+2. Send a `/login` sentence with `=name=<user>` and `=password=<password>`.
+3. RouterOS replies with `!done` on success.
+
+The older MD5 challenge-response method is obsolete. Because current login sends the password directly in the API message, use TLS and validate the router certificate.
 
 Most users should use an existing library rather than implementing this directly.
 
@@ -646,7 +613,7 @@ RouterOS supports running OCI-compatible containers via the `container` package.
 /interface/bridge/port add interface=veth1 bridge=bridge1
 
 # 4. Pull and create the container
-/container add remote-image=alpine:latest interface=veth1 \
+/container add remote-image=alpine:3.24.1 interface=veth1 \
     root-dir=disk1/containers/alpine logging=yes
 
 # 5. Start / stop
@@ -695,7 +662,7 @@ Manual setup:
 /ip/pool add name=hs-pool ranges=192.168.100.2-192.168.100.254
 
 # Add a local user
-/ip/hotspot/user add name=guest password=guest123 profile=default
+/ip/hotspot/user add name=guest password=<strong-unique-password> profile=default
 
 # Set rate limit on the default profile
 /ip/hotspot/user/profile set default rate-limit=10M/10M
@@ -901,7 +868,7 @@ Enter safe mode from CLI by pressing `Ctrl+X`. All changes are automatically rev
 /ip/ipsec/peer add name=site-b address=203.0.113.2/32 exchange-mode=ike2
 
 # Identity (authentication — pre-shared key)
-/ip/ipsec/identity add peer=site-b auth-method=pre-shared-key secret=s3cr3t
+/ip/ipsec/identity add peer=site-b auth-method=pre-shared-key secret=<strong-random-psk>
 
 # Policy (traffic to protect)
 /ip/ipsec/policy add src-address=192.168.1.0/24 dst-address=192.168.2.0/24 \
